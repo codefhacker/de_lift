@@ -16,7 +16,7 @@ class IRSensor {
     void setupIR(); // setup infrarood sensor
 
    
-    bool getOutputIR(); // haal 0 of 1 van infarood sensor
+    char getOutputIR(); // haal 0 of 1 van infarood sensor
 };
 
 
@@ -43,4 +43,4 @@ class SegmentDisplay {
     
 };
 
-#endif  
+#endif
