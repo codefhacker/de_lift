@@ -13,10 +13,14 @@ void IRSensor::setupIR() {
 }
 
 // lees de infrarood sensor en invert hem want 1 is normaal niks en 0 wel
-bool IRSensor::getOutputIR() {
+char IRSensor::getOutputIR() {
   outputIR = digitalRead(sensorPin);  // lees de infrarood sensor
   outputIR = !outputIR;               // invert de output met !
-  return outputIR;                    // return de waarde van de infrarood sensor
+  if (outputIR) {
+    return '0';
+  }else {
+    return '1';
+  }                    // return de waarde van de infrarood sensor
 }
 
 
@@ -183,10 +187,3 @@ void SegmentDisplay::writeNumber(int displayNumber){
 
 
 }
-
-
-
-
-
-
-
