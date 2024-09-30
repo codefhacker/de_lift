@@ -1,15 +1,3 @@
-// Wire Slave Receiver
-// by Nicholas Zambetti <http://www.zambetti.com>
-
-// Demonstrates use of the Wire library
-// Receives data as an I2C/TWI slave device
-// Refer to the "Wire Master Writer" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
-
-
 #include <Wire.h>
 #include "IO_lift.h"
 #define SLAVE_ADDR 4
@@ -17,9 +5,14 @@
 
 
 IRSensor IRSensor(12);
-char value;
-char *verdieping[] = {value, "1", "2", "3", "4"};
+char IR_value;
+char Knop_value;
+char Total_value;
+char verdieping[] = {IR_value, "1", "2", "3", "4"};
 int v = 0;
+
+
+
 
 void setup()
 {
@@ -34,8 +27,8 @@ void setup()
 void loop()
 {
   delay(100);
-  value = IRSensor.getOutputIR();
-  Serial.println(value);
+  IR_value = IRSensor.getOutputIR();
+  Serial.println(IR_value);
 }
 
 // function that executes whenever data is received from master
@@ -56,11 +49,18 @@ void receiveEvent(int howMany)
 void requestEvent() {
 
   // as expected by master
-
-  Wire.write(value);
-
-  // Wire.write(myStrings2[k]);
-  // Wire.write(myStrings3[m]);
-  // Wire.write(myStrings4[0]);
+  if(IR_value == '0' && Knop_value == '0') { 
+    Total_value = '0';
+  }
+  else if (IR_value == '0' && Knop_value == '1') { 
+    Total_value = '1';
+  }
+  else if (IR_value == '1' && Knop_value == '0') { 
+    Total_value = '2';
+  }
+  else if (IR_value == '1' && Knop_value == '1') { 
+    Total_value = '3'
+  }
+  Wire.write(Total_value);
 
 }
