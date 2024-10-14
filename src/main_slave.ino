@@ -1,16 +1,24 @@
 #include <Wire.h>
 #include "IO_lift.h"
+#include "Logica_lift.h"
 #define SLAVE_ADDR 4
 #define ANSWERSIZE 1
+Logica Logica;
 
+IRSensor IRSensor(7);  // 7 op de pcb
+//SegmentDisplay SegmentDisplay(8, 12, 11); // latchpin , 
+LiftKnop LiftKnop1(2, 4); // knoppin , ledpin
+LiftKnop LiftKnop2(3, 5); // knoppin , ledpin
+//MotorLift MotorLift(5,6,7);
 
-IRSensor IRSensor(12);
+MotorLift MotorLift(13,12,11);
+
 char IR_value;
 char Knop_value;
-char Total_value;
-char verdieping[] = {IR_value, "1", "2", "3", "4"};
-int v = 0;
+int Total_value;
 
+int statusKopBoven;
+int statusKopBeneden;
 
 
 
@@ -20,47 +28,73 @@ void setup()
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
-  IRSensor.setupIR();
+  IRSensor.setupIR(); // ir sensor instellen
+  //SegmentDisplay.setupSegmentDisplay(); // segment display instellen
+  LiftKnop1.setupPins(); // liftknop 1 instellen
+  LiftKnop2.setupPins(); // liftknop 2 instellen
+  pinMode(13, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(11, OUTPUT);
+  MotorLift.setupMotor();
+  // digitalWrite(13, HIGH);
+  // digitalWrite(12, 1);
+  // digitalWrite(11, 0);
+  
+  Serial.println("test123");
+
   
 }
 
 void loop()
 {
-  delay(100);
+  MotorLift.controlMotor(2);
   IR_value = IRSensor.getOutputIR();
-  Serial.println(IR_value);
+  //Serial.println(IR_value);
+  LiftKnop1.readButton();
+  LiftKnop2.readButton();
+  statusKopBoven = LiftKnop1.knopState;
+  statusKopBeneden = LiftKnop2.knopState;
+  //Serial.print(statusKop1);
+  
+  // if (statusKopBeneden){
+  //   digitalWrite(13, HIGH);
+  // }
+  // if(IR_value == '0'){
+  //   digitalWrite(13, LOW);
+  // }
+  // digitalWrite(13, HIGH);
+  // digitalWrite(12, 1);
+  // digitalWrite(11, 0);
 }
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
-void receiveEvent(int howMany)
+void receiveEvent()
 {
-  while(1 < Wire.available()) // loop through all but the last
-  {
-    char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
-  }
+  
   int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
-
+  //Serial.println(x);         // print the integer
+  Serial.println(x);
 
 }
 
 void requestEvent() {
-
+  IR_value = IRSensor.getOutputIR();
+  //Serial.println(IR_value);
+  LiftKnop1.readButton();
+  LiftKnop2.readButton();
+  statusKopBoven = LiftKnop1.knopState;
+  statusKopBeneden = LiftKnop2.knopState;
+  //Serial.print("ir :");
+  //Serial.println(IR_value);
+  //Serial.print("knop2 :");
+  //Serial.println(statusKopBeneden);
+  
   // as expected by master
-  if(IR_value == '0' && Knop_value == '0') { 
-    Total_value = '0';
-  }
-  else if (IR_value == '0' && Knop_value == '1') { 
-    Total_value = '1';
-  }
-  else if (IR_value == '1' && Knop_value == '0') { 
-    Total_value = '2';
-  }
-  else if (IR_value == '1' && Knop_value == '1') { 
-    Total_value = '3'
-  }
-  Wire.write(Total_value);
+  Total_value = Logica.berekenTotaleWaarde(statusKopBoven,statusKopBeneden,IR_value);
+  
 
+  //Serial.print("Sending Total_value: ");
+  //Serial.println(Total_value);  // Print what is being sent
+  Wire.write(Total_value);  // Send the byte to the master
 }
