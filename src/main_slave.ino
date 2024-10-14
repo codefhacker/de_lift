@@ -6,12 +6,12 @@
 Logica Logica;
 
 IRSensor IRSensor(7);  // 7 op de pcb
-//SegmentDisplay SegmentDisplay(8, 12, 11); // latchpin , 
+SegmentDisplay SegmentDisplay(8, 12, 11); // latchpin , 
 LiftKnop LiftKnop1(2, 4); // knoppin , ledpin
 LiftKnop LiftKnop2(3, 5); // knoppin , ledpin
 //MotorLift MotorLift(5,6,7);
 
-MotorLift MotorLift(13,12,11);
+//MotorLift MotorLift(13,12,11);
 
 char IR_value;
 char Knop_value;
@@ -29,13 +29,13 @@ void setup()
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
   IRSensor.setupIR(); // ir sensor instellen
-  //SegmentDisplay.setupSegmentDisplay(); // segment display instellen
+  SegmentDisplay.setupSegmentDisplay(); // segment display instellen
   LiftKnop1.setupPins(); // liftknop 1 instellen
   LiftKnop2.setupPins(); // liftknop 2 instellen
   pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
-  MotorLift.setupMotor();
+  //MotorLift.setupMotor();
   // digitalWrite(13, HIGH);
   // digitalWrite(12, 1);
   // digitalWrite(11, 0);
@@ -47,21 +47,21 @@ void setup()
 
 void loop()
 {
-  MotorLift.controlMotor(2);
+  //MotorLift.controlMotor(2);
   IR_value = IRSensor.getOutputIR();
   //Serial.println(IR_value);
   LiftKnop1.readButton();
   LiftKnop2.readButton();
   statusKopBoven = LiftKnop1.knopState;
   statusKopBeneden = LiftKnop2.knopState;
-  //Serial.print(statusKop1);
+  //Serial.print(statusKopBoven);
   
-  // if (statusKopBeneden){
-  //   digitalWrite(13, HIGH);
-  // }
-  // if(IR_value == '0'){
-  //   digitalWrite(13, LOW);
-  // }
+  if (statusKopBeneden){
+    digitalWrite(13, HIGH);
+  }
+  if(IR_value == '0'){
+    digitalWrite(13, LOW);
+  }
   // digitalWrite(13, HIGH);
   // digitalWrite(12, 1);
   // digitalWrite(11, 0);
@@ -73,28 +73,28 @@ void receiveEvent()
 {
   
   int x = Wire.read();    // receive byte as an integer
-  //Serial.println(x);         // print the integer
+  Serial.println(x);         // print the integer
   Serial.println(x);
 
 }
 
 void requestEvent() {
   IR_value = IRSensor.getOutputIR();
-  //Serial.println(IR_value);
+  Serial.println(IR_value);
   LiftKnop1.readButton();
   LiftKnop2.readButton();
   statusKopBoven = LiftKnop1.knopState;
   statusKopBeneden = LiftKnop2.knopState;
-  //Serial.print("ir :");
-  //Serial.println(IR_value);
-  //Serial.print("knop2 :");
-  //Serial.println(statusKopBeneden);
+  Serial.print("ir :");
+  Serial.println(IR_value);
+  Serial.print("knop2 :");
+  Serial.println(statusKopBeneden);
   
   // as expected by master
   Total_value = Logica.berekenTotaleWaarde(statusKopBoven,statusKopBeneden,IR_value);
   
 
-  //Serial.print("Sending Total_value: ");
-  //Serial.println(Total_value);  // Print what is being sent
+  Serial.print("Sending Total_value: ");
+  Serial.println(Total_value);  // Print what is being sent
   Wire.write(Total_value);  // Send the byte to the master
 }
