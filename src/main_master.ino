@@ -1,22 +1,16 @@
-// Wire Master Writer
-// by Nicholas Zambetti <http://www.zambetti.com>
-
-// Demonstrates use of the Wire library
-// Writes data to an I2C/TWI slave device
-// Refer to the "Wire Slave Receiver" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
+// What pins define for interrupts?
+// Defined address (4,5) as i2c adresses
 
 
 #include <Wire.h>
+#include "Logica_lift.h"
+#include <vector>
+#include <stdio.h>
+
 
 int t;
-char c;
-void setup()
-
-{
+int c;
+void setup(){
   Serial.begin(9600);
   Serial.println("test123");
   Wire.begin(); // join i2c bus (address optional for master)
@@ -24,38 +18,93 @@ void setup()
 
 byte x = 0;
 
-void loop()
-{
-  Wire.beginTransmission(4); // transmit to device #4
-  
-  Wire.write("x is ");        // sends five bytes
-  Wire.write(x);              // sends one byte  
-  Wire.endTransmission();    // stop transmitting
+int currentFloor = 0;
+std::vector<std::vector<int>>> queue; // queue of commands
+int upDown;
 
-  x++;
-  delay(10);
-  ReceiveSlave(4);
 
-  Wire.beginTransmission(5); // transmit to device #4
-  
-  Wire.write("x is ");        // sends five bytes
-  Wire.write(x);              // sends one byte  
-  Wire.endTransmission();    // stop transmitting
-  delay(10);
-  ReceiveSlave(5);
+
+
+
+void loop(){
+
+  for(int i= 0 ; i =< 5; i++) {
+    setCurrentFloorLift(ReceiveSlave(i), i);
+  }
+
   
 
-  char value[2];
+
 }
 
 
-void ReceiveSlave(int slavenumer)  {
+void setCurrentFloorLift(int code, int floor) {
+  switch (code) {
+
+    // Lift detected
+    case 1:
+      currentFloor = floor;
+      break;
+
+    case 3:
+      // down
+      currentFloor = floor;
+      queue.push_back(std::vector<int>{floor, 0});
+      break;
+
+    case 5:
+      // up
+      currentFloor = floor;
+      queue.push_back(std::vector<int>{floor, 1});
+      break;
+
+    case 7:
+      // both pressed
+      currentFloor = floor;
+      break;
+
+
+    // no lift detected
+
+    case 2:
+      //down
+      queue.push_back(std::vector<int>{floor, 0});
+      break;
+
+    case 4:
+      //up
+      queue.push_back(std::vector<int>{floor, 1});
+      break;
+
+    case 6:
+
+      queue.push_back(std::vector<int>{floor,0});
+      queue.push_back(std::vector<int>{floor, 1});
+
+    break;
+
+
+
+
+  }
+
+
+
+
+}
+
+
+int ReceiveSlave(int slavenumer)  {
   Wire.requestFrom(slavenumer, 2);
   int i = 0; //counter for each bite as it arrives
   while (Wire.available()) {
     c = Wire.read(); // every character that arrives it put in order in the empty array "t"
     
   }
+
   Serial.println(c);   //shows the data in the array t
+
+
+  return c;
   delay(10);
 }
