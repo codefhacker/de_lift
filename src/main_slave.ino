@@ -32,9 +32,6 @@ void setup()
   SegmentDisplay.setupSegmentDisplay(); // segment display instellen
   LiftKnop1.setupPins(); // liftknop 1 instellen
   LiftKnop2.setupPins(); // liftknop 2 instellen
-  pinMode(13, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(11, OUTPUT);
   //MotorLift.setupMotor();
   // digitalWrite(13, HIGH);
   // digitalWrite(12, 1);
@@ -59,7 +56,7 @@ void loop()
   if (statusKopBeneden){
     digitalWrite(13, HIGH);
   }
-  if(IR_value == '0'){
+  if(IR_value == 1){
     digitalWrite(13, LOW);
   }
   // digitalWrite(13, HIGH);
@@ -74,21 +71,20 @@ void receiveEvent()
   
   int x = Wire.read();    // receive byte as an integer
   Serial.println(x);         // print the integer
-  Serial.println(x);
-
+  //SegmentDisplay.writeNumber(x);
 }
 
 void requestEvent() {
   IR_value = IRSensor.getOutputIR();
-  Serial.println(IR_value);
+  //Serial.println(IR_value);
   LiftKnop1.readButton();
-  LiftKnop2.readButton();
+  LiftKnop2.readButton(); 
   statusKopBoven = LiftKnop1.knopState;
   statusKopBeneden = LiftKnop2.knopState;
-  Serial.print("ir :");
-  Serial.println(IR_value);
-  Serial.print("knop2 :");
-  Serial.println(statusKopBeneden);
+  // Serial.print("ir :");
+  // Serial.println(IR_value);
+  // Serial.print("knop2 :");
+  // Serial.println(statusKopBeneden);
   
   // as expected by master
   Total_value = Logica.berekenTotaleWaarde(statusKopBoven,statusKopBeneden,IR_value);
