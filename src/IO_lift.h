@@ -30,7 +30,7 @@ class IRSensor {
   public:
     IRSensor(int pin);
     void setupIR(); // setup infrarood sensor
-    int getOutputIR(); // haal 0 of 1 van infarood sensor
+    char getOutputIR(); // haal 0 of 1 van infarood sensor
 };
 
 class SegmentDisplay {
