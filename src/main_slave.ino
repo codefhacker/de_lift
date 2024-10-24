@@ -44,6 +44,25 @@ void setup()
   // digitalWrite(11, 0);
   
   Serial.println("test123");
+  SegmentDisplay.writeNumber(9);
+  delay(1000);
+  SegmentDisplay.writeNumber(8);
+  delay(1000);
+  SegmentDisplay.writeNumber(7);
+  delay(1000);
+  SegmentDisplay.writeNumber(6);
+  delay(1000);
+  SegmentDisplay.writeNumber(5);
+  delay(1000);
+  SegmentDisplay.writeNumber(4);
+  delay(1000);
+  SegmentDisplay.writeNumber(3);
+  delay(1000);
+  SegmentDisplay.writeNumber(2);
+  delay(1000);
+  SegmentDisplay.writeNumber(1);
+  delay(1000);
+  SegmentDisplay.writeNumber(0);
   
 
 
