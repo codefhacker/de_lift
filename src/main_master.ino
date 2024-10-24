@@ -1,85 +1,117 @@
-// #include <Wire.h>
-// #include "IO_lift.h"
-// #include "Logica_lift.h"
-// int t;
-// int c;
 
-// MotorLift MotorLift(13,12,11);
-// void setup()
+#include <Arduino.h>
+#include <Wire.h>
 
-// {
-//   MotorLift.setupMotor();
-//   Serial.begin(9600);
-//   Serial.println("test123");
-//   Wire.begin(); // join i2c bus (address optional for master)
-// }
 
-// int x = 0;
+void setup() {
+  Serial.begin (9600);
+  Serial.println("initializing");
+  Wire.begin(); // Join i2c bus (address optional for master)
+}
 
-// void loop()
-// {
-//   MotorLift.controlMotor(0);
-//   Wire.beginTransmission(4); // transmit to device #4
+
+byte x = 0;
+int currentFloor = 0;
+int upDown = 0;
+
+int queueCounter = 0; // counter that shows the latest queue
+int queue[25][2]; // queue of commands 
+
+
+/*
+[[floor, direction]]
+direction [0/1/2]
+0 -> down
+1 -> up
+2 -> undecided
+*/
+
+
+void loop() {
+  for (int i=0 ; i <= 5; i++) {
+    setCurrentFloorLift(ReceiveSlave(i), i);
+  }
+
+  transmitCurrentFloor();
   
-//   //Wire.write("x is ");        // sends five bytes
-//   Wire.write(x);              // sends one byte  
-//   Wire.endTransmission();    // stop transmitting
-
-//   // Wire.beginTransmission(2); // transmit to device #4
-  
-//   // Wire.write("x is ");        // sends five bytes
-//   // Wire.write(x);              // sends one byte  
-//   // Wire.endTransmission();
-
-//   Wire.beginTransmission(3); // transmit to device #4
-  
-//   Wire.write("x is ");        // sends five bytes
-//   Wire.write(x);              // sends one byte  
-//   Wire.endTransmission();
-
-//   // Wire.beginTransmission(4); // transmit to device #4
-  
-//   // Wire.write("x is ");        // sends five bytes
-//   // Wire.write(x);              // sends one byte  
-//   // Wire.endTransmission();
-
-//   // Wire.beginTransmission(5); // transmit to device #4
-  
-//   // Wire.write("x is ");        // sends five bytes
-//   // Wire.write(x);              // sends one byte  
-//   // Wire.endTransmission();
-
-//   x++;
-//   ReceiveSlave(2);
-  
-//   ReceiveSlave(4);
-//   // ReceiveSlave(2);
-//   // ReceiveSlave(3);
-//   // ReceiveSlave(4);
-//   // ReceiveSlave(5);
-
-//   if (x >=9){
-//     x = 0;
-//   }
-
-  
-  
-
-  
-// }
+}
+ 
 
 
-// void ReceiveSlave(int slavenumer)  {
-//   Wire.requestFrom(slavenumer, 2);
-  
-  
-//   c = Wire.read(); // every character that arrives it put in order in the empty array "t"
-//   if (c == 1){
-//     MotorLift.controlMotor(2);
-//   }
-  
-//   Serial.print("recieved from : ");
-//   Serial.println(slavenumer);
-//   Serial.println(c);   //shows the data in the array t
-  
-// }
+
+void setCurrentFloorLift(int code, int floor) {
+  switch (code) {
+    
+    //Lift detected
+    case 1:
+      currentFloor = floor;
+      break;
+
+    case 3:
+    // down pressed
+      currentFloor = floor;
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 0;
+      break;
+
+    case 5:
+    //up
+      currentFloor = floor;
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 1;
+      break;
+
+    case 7:
+    //Both pressed
+      currentFloor = floor;
+      break;
+
+
+    // no lift detected
+    case 2:
+      // down
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 0;
+      break;
+    
+    case 4:
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 1;
+      break;
+
+
+    case 6:
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 0;
+
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 1;
+
+      break;
+  }
+
+}
+
+void transmitCurrentFloor() {
+  for (int i = 0; i <= 4 ; i++) {
+    Wire.beginTransmission(i);
+    Wire.write(currentFloor);
+    Wire.endTransmission();
+  }
+}
+
+int ReceiveSlave(int slavenumer)  {
+  int c;
+  Wire.requestFrom(slavenumer, 2);
+  int i = 0; //counter for each bite as it arrives
+  while (Wire.available()) {
+    c = Wire.read(); // every character that arrives it put in order in the empty array "t"
+    
+  }
+
+  Serial.println(c);   //shows the data in the array t
+
+
+  return c;
+  delay(10);
+}
