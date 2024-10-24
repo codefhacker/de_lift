@@ -9,6 +9,8 @@
 
 int t;
 int c;
+
+
 void setup(){
   Serial.begin(9600);
   Serial.println("test123");
@@ -19,7 +21,15 @@ byte x = 0;
 
 int currentFloor = 0;
 std::vector<std::vector<int>>> queue; // queue of commands
-int upDown; // 0 -> down, 1 -> up
+/*
+[[<floor>, 0(down)/1(up)], [<floor>, 0/1], etc.....] 
+*/
+
+std::vector<std::vector<<int>>> moveQueue;
+
+
+
+int upDown; // 0 -> down, 1 -> up (2 for undecided direction?)
 
 
 void loop(){
@@ -32,6 +42,14 @@ void loop(){
   transmitCurrentFloor();
 
 
+
+}
+
+
+void move() {
+  // stub for movement of the lift
+
+  
 }
 
 
@@ -94,8 +112,9 @@ void transmitCurrentFloor() {
 }
 
 
-int determineDestination() {
+void determineDestination() { // TODO may have it return a list of movement instead.....
   // if max and or lowest
+
   if (currentFloor = 0) {
     upDown = 1;
   }
@@ -109,11 +128,8 @@ int determineDestination() {
   // Grab all the requests above and below
   std::vector<std::vector<int>> above;
   std::vector<std::vector<int>> below;
-  
   std::vector<int> highest;
   std::vector<int> lowest;
-
-  std::vector<int> destFloors;
 
   // TODO -> up and down button requests, now it's just navigation
 
@@ -133,22 +149,29 @@ int determineDestination() {
   }
 
 
+  // TODO filter based on the movement.
   if (upDown == 0) {
-    
-    
-    
-  } else { // above direction
+    // here be side effects.
+    moveQueue.insert(moveQueue.begin(), below.begin(), below.end() )
+    // move to lowest, but base that off of movequeue
+    // move (lowest)
 
-  }
+  } else if (upDown == 1) { // above direction
+    moveQueue.insert(moveQueue.begin(), above.begin(), above.end() );
+
+    // TODO sort the direction and add the highest or lowest to the end
   
-
-
+  } else {
+    moveQueue.insert(queue.begin());
+    
+  }
 
 }
 
 
 
 int ReceiveSlave(int slavenumer)  {
+
   Wire.requestFrom(slavenumer, 2);
   int i = 0; //counter for each bite as it arrives
   while (Wire.available()) {
