@@ -31,13 +31,13 @@ void IRSensor::setupIR() {
 }
 
 // lees de infrarood sensor en invert hem want 1 is normaal niks en 0 wel
-int IRSensor::getOutputIR() {
+char IRSensor::getOutputIR() {
   outputIR = digitalRead(sensorPin);  // lees de infrarood sensor
   outputIR = !outputIR;               // invert de output met !
   if (outputIR) {
-    return 1;
+    return '0';
   }else {
-    return 0;
+    return '1';
   }                    // return de waarde van de infrarood sensor
 }
 
@@ -85,7 +85,7 @@ void SegmentDisplay::writeNumber(int displayNumber){
   switch (displayNumber) {
     case 0:{ // nummer 0
       byte data;
-      data = 0b11111110;
+      data = 0b01111111;
       digitalWrite(shiftregisterLatchpin, 0);
       shiftOut(data);
       digitalWrite(shiftregisterLatchpin, 1);
@@ -250,6 +250,7 @@ void MotorLift::controlMotor(int state){
       break;
   }
 }
+
 
 
 
