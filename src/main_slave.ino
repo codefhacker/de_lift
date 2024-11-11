@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "IO_lift.h"
 #include "Logica_lift.h"
-#define SLAVE_ADDR 2
+#define SLAVE_ADDR 5
 #define ANSWERSIZE 1
 Logica Logica;
 
@@ -9,9 +9,6 @@ IRSensor IRSensor(7);  // 7 op de pcb
 SegmentDisplay SegmentDisplay(8, 12, 11); // latchpin , 
 LiftKnop LiftKnop1(6, 9); // knoppin , ledpin
 LiftKnop LiftKnop2(4, 5); // knoppin , ledpin
-//MotorLift MotorLift(5,6,7);
-
-//MotorLift MotorLift(13,12,11);
 
 char IR_value;
 char Knop_value;
@@ -24,7 +21,7 @@ int statusKopBeneden;
 
 void setup()
 {
-  Wire.begin(2);                // join i2c bus with address #4
+  Wire.begin(SLAVE_ADDR);                // join i2c bus with address #4
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
@@ -38,31 +35,12 @@ void setup()
   pinMode(11, OUTPUT);
   pinMode(9, OUTPUT);
   pinMode(5, OUTPUT);
-  //MotorLift.setupMotor();
-  // digitalWrite(13, HIGH);
-  // digitalWrite(12, 1);
-  // digitalWrite(11, 0);
-  
+
   Serial.println("test123");
-  SegmentDisplay.writeNumber(9);
-  delay(1000);
-  SegmentDisplay.writeNumber(8);
-  delay(1000);
-  SegmentDisplay.writeNumber(7);
-  delay(1000);
-  SegmentDisplay.writeNumber(6);
-  delay(1000);
-  SegmentDisplay.writeNumber(5);
-  delay(1000);
-  SegmentDisplay.writeNumber(4);
-  delay(1000);
-  SegmentDisplay.writeNumber(3);
-  delay(1000);
-  SegmentDisplay.writeNumber(2);
-  delay(1000);
-  SegmentDisplay.writeNumber(1);
-  delay(1000);
-  SegmentDisplay.writeNumber(0);
+  for (int i = 0; i <=9; i++){
+    SegmentDisplay.writeNumber(i);
+    delay(1000);
+  }
   
 
 
@@ -71,11 +49,9 @@ void setup()
 
 void loop()
 {
-  //MotorLift.controlMotor(2);
   IR_value = IRSensor.getOutputIR();
   int knop12;
   int knop13;
-  //Serial.println(IR_value);
   LiftKnop1.readButton();
   LiftKnop2.readButton();
   
@@ -98,7 +74,7 @@ void loop()
     
     
   }
-  if(IR_value == '0'){
+  if(IR_value == '1'){
     digitalWrite(A0, LOW);
     digitalWrite(A1, LOW);
     digitalWrite(9, LOW);
@@ -135,6 +111,10 @@ void requestEvent() {
   Total_value = Logica.berekenTotaleWaarde(statusKopBoven,statusKopBeneden,IR_value);
   
 
+  Serial.print("Sending Total_value: ");
+  Serial.println(Total_value);  // Print what is being sent
+  Wire.write(Total_value);  // Send the byte to the master
+}
   Serial.print("Sending Total_value: ");
   Serial.println(Total_value);  // Print what is being sent
   Wire.write(Total_value);  // Send the byte to the master
