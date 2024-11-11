@@ -35,9 +35,9 @@ char IRSensor::getOutputIR() {
   outputIR = digitalRead(sensorPin);  // lees de infrarood sensor
   outputIR = !outputIR;               // invert de output met !
   if (outputIR) {
-    return '0';
-  }else {
     return '1';
+  }else {
+    return '0';
   }                    // return de waarde van de infrarood sensor
 }
 
