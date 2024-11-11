@@ -1,9 +1,14 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "ArduinoSort.h"
+#include "IO_lift.h"
 
+
+
+MotorLift MotorLift(13,12,11);
 
 void setup() {
+  MotorLift.setupMotor();
   Serial.begin (9600);
   Serial.println("initializing");
   Wire.begin(); // Join i2c bus (address optional for master)
@@ -20,6 +25,8 @@ int queue[25][2]; // queue of commands
 int moveQueueCounter = 0;
 int moveQueue[25];
 
+int destination;
+
 
 /*
 [[floor, direction]]
@@ -30,16 +37,15 @@ direction [0/1/2]
 */
 
 
-//TODO create code to move the engine to a specified floor 
-
-
 
 void loop() {
   for (int i=0 ; i <= 5; i++) {
     setCurrentFloorLift(ReceiveSlave(i), i);
   }
-
+  moveLift();
   transmitCurrentFloor();
+  setMoveQueue();
+
   
 }
 
@@ -71,6 +77,19 @@ void setMoveQueue() {
       moveQueue[moveQueueCounter] = queue[i][0];
       indexToClear[25]++;
     }
+    else {
+      if (moveQueueCounter =< 0) {
+        if (queueCounter == 0) {
+          return;
+        }
+
+        if ((currentFloor - queue[0]) < 0) {
+          upDown = 1;
+        } else {
+          upDown = 0;
+        }
+      }
+    }
   }
 
   // Clean up queue
@@ -93,6 +112,38 @@ void setMoveQueue() {
   } else {
     sortArrayReverse(moveQueue,moveQueueCounter);
   }
+
+}
+
+void moveLift() {
+  if (destination == currentFloor) {
+    MotorLift::controlMotor(0)
+
+    if (moveQueueCounter > 0) { // set new destination
+      destination = moveQueueCounter[0];
+
+      for (i=0; i < moveQueueCounter; i++) {
+        moveQueue[i] = moveQueue[i+1];
+      }
+      moveQueueCounter--;
+      
+    } else {
+      return;
+    }
+  }
+
+  switch(upDown) {
+    case 0:
+    MotorLift::controlMotor(2)
+    break;
+
+
+    case 1:
+    MotorLift::controlMotor(1)
+    break;
+
+  }
+
 
 }
  
