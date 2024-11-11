@@ -13,7 +13,7 @@ Voorbeelden hoe je alles moet coderen is te vinden in de map voorbeelden.
 zie ook de Logica_lift libary voor de logica van de lift zoals het berekenen van de verdieping en het bereken van de waarde die verstuurd wordt via i2c naar de master.
 
 
-Datum laatst gewijzigd : 13-10-2024
+Datum laatst gewijzigd : 11-11-2024
 
 */
 
