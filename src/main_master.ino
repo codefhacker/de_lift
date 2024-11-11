@@ -8,6 +8,10 @@ int c;
 const byte ROWS = 4; 
 const byte COLS = 4; 
 
+Logica Logica;
+
+
+
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3', 'A'},
   {'4', '5', '6', 'B'},
@@ -45,20 +49,17 @@ void loop()
 
   for(int i = 1; i <=6; i++){
     Wire.beginTransmission(i); // transmit to device #4
-    Wire.write(x);              // sends one byte  
+    Wire.write(Logica.huidigVerdieping);              // sends one byte  
     Wire.endTransmission();    // stop transmitting
   }
   x++;
 
-  for (int i = 1; i <= 1; i++){
+  for (int i = 1; i <= 5; i++){
     ReceiveSlave(i);
   }
   
   
-  //delay(1000);
-  if (x >=9){
-    x = 0;
-  }
+  
 
   
   
@@ -72,12 +73,29 @@ void ReceiveSlave(int slavenumer)  {
   
   
   c = Wire.read(); // every character that arrives it put in order in the empty array "t"
-  if (c == 1){
+ 
+  
+  if (c == 3 || c == 5){
+    Logica.berekenWaarNaarToe(1,slavenumer - 1);
+    Serial.println("lift gedetecteerd");
     MotorLift.controlMotor(2);
+    Serial.println(Logica.verdieping[slavenumer -1]);
+    Logica.huidigVerdieping = slavenumer - 1;
   }
-  
-  // Serial.print("recieved from : ");
-  // Serial.println(slavenumer);
-  // Serial.println(c);   //shows the data in the array t
-  
+  if (c == 1){
+    Logica.huidigVerdieping = slavenumer - 1;
+    Serial.println("sensor detecteerd");
+    Serial.print("c :");
+    Serial.println(c);
+    Serial.println(slavenumer);
+    Serial.print("verieping :");
+  Serial.println(Logica.huidigVerdieping);
+  }
+  Serial.println(c);
 }
+  
+
+  
+  
+  
+  
