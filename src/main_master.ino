@@ -37,14 +37,36 @@ direction [0/1/2]
 
 
 void loop() {
-  for (int i=0 ; i <= 5; i++) {
+  
+  for (int i=1 ; i < 6; i++) {
     setCurrentFloorLift(ReceiveSlave(i), i);
   }
   moveLift();
   transmitCurrentFloor();
   setMoveQueue();
 
-  
+  printQueue();
+
+}
+
+void printQueue(){
+  Serial.print("CurrentFloor:   ");
+  Serial.println(currentFloor);
+
+  for (int i = 0; i < queueCounter; i++) {
+    Serial.print(queue[i][0]);
+    Serial.print(". ");
+    Serial.print("|");
+  }
+  Serial.println();
+
+  for (int i = 0; i < moveQueueCounter; i++) {
+    Serial.print(moveQueue[i]);
+    Serial.print(". ");
+    Serial.print("|");
+  }
+  Serial.println();
+
 }
 
 
@@ -150,10 +172,6 @@ void moveLift() {
 
 void setCurrentFloorLift(int code, int floor) {
 
-  // check if there's enough space in queue
-  if ((sizeof(queue)/sizeof(queue[0])) >= 25) {
-    return;
-  }
 
 
   switch (code) {
@@ -212,7 +230,7 @@ void setCurrentFloorLift(int code, int floor) {
 
 
 void transmitCurrentFloor() {
-  for (int i = 0; i <= 4 ; i++) {
+  for (int i = 1; i <= 6 ; i++) {
     Wire.beginTransmission(i);
     Wire.write(currentFloor);
     Wire.endTransmission();
@@ -224,12 +242,12 @@ void transmitCurrentFloor() {
 int ReceiveSlave(int slavenumer)  {
   int c;
   Wire.requestFrom(slavenumer, 2);
-  while (Wire.available()) {
-    c = Wire.read(); // every character that arrives it put in order in the empty array "t"
-    
-  }
+  c = Wire.read();
 
+
+  Serial.print("ReceiveSlave");
+  Serial.println(slavenumer);
   Serial.println(c);   //shows the data in the array t
+  Serial.println("-------");
   return c;
-  delay(10);
 }
