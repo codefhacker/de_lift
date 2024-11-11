@@ -117,7 +117,7 @@ void setMoveQueue() {
 
 void moveLift() {
   if (destination == currentFloor) {
-    MotorLift.controlMotor(0)
+    MotorLift.controlMotor(0);
 
     if (moveQueueCounter > 0) { // set new destination
       destination = moveQueueCounter[0];
@@ -134,12 +134,12 @@ void moveLift() {
 
   switch(upDown) {
     case 0:
-    MotorLift.controlMotor(2)
+    MotorLift.controlMotor(2);
     break;
 
 
     case 1:
-    MotorLift.controlMotor(1)
+    MotorLift.controlMotor(1);
     break;
 
   }
