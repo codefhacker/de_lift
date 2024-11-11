@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include "ArduinoSort.h"
 
 
 void setup() {
@@ -31,6 +32,8 @@ direction [0/1/2]
 
 //TODO create code to move the engine to a specified floor 
 
+
+
 void loop() {
   for (int i=0 ; i <= 5; i++) {
     setCurrentFloorLift(ReceiveSlave(i), i);
@@ -42,57 +45,54 @@ void loop() {
 
 
 
-void sortFloors(int direction, int &array) {
-
-
-
-}
-
-
 void setMoveQueue() {
 
-  if(currentFloor = 0){
+  if(currentFloor == 0){
     upDown = 1;
   }
 
-  if (currentFloor = 5) {
+  if (currentFloor == 5) {
     upDown = 0;
   }
-  
-
-  int above[25][2];
-  int below[25][2];
-  int highest;
-  int lowest;
 
   int indexToClear[25];
-  indexToClear[25] = 0; // indexToClear at element 25 is the ind counter
+  indexToClear[25] = 0; // indexToClear at element 25 is the index counter
 
   for (int i=0; i <= queueCounter; i++) {
-    if (queue[i][0] > currentFloor && queue[i][1]==upDown) {
-      // TODO make a function to shift movequeue
-      //TODO make a function to sort the above array from highest to lowest
-      // and vice versa
-    
+    if (queue[i][0] > currentFloor && queue[i][1]==upDown && upDown == 1) {
       indexToClear[indexToClear[25]] = i;
       moveQueue[moveQueueCounter] = queue[i][0];
 
       indexToClear[25]++;
     }
 
-    else if (queue[i][0] < currentFloor && queue[i][1]==upDown) {
+    else if (queue[i][0] < currentFloor && queue[i][1]==upDown && upDown == 0) {
       indexToClear[indexToClear[25]] = i;
       moveQueue[moveQueueCounter] = queue[i][0];
-
       indexToClear[25]++;
-    }
-
-    else {
-      moveQueue[moveQueueCounter] = queue[0][0];
     }
   }
 
+  // Clean up queue
+  for (int i=0; i < indexToClear[25]; i++) {
 
+    for (int target = indexToClear[i]; i < queueCounter; i++) {
+      // shift and delete elements to the left and decrement the queueCounter
+      queue[target][0] = queue[target+1][0];
+      queue[target][1] = queue[target+1][1];
+    }
+    queueCounter--;
+
+  }
+  indexToClear[25] = 0;
+
+
+  if (upDown == 1) {
+    sortArray(moveQueue, moveQueueCounter);
+
+  } else {
+    sortArrayReverse(moveQueue,moveQueueCounter);
+  }
 
 }
  
@@ -175,7 +175,6 @@ void transmitCurrentFloor() {
 int ReceiveSlave(int slavenumer)  {
   int c;
   Wire.requestFrom(slavenumer, 2);
-  int i = 0; //counter for each bite as it arrives
   while (Wire.available()) {
     c = Wire.read(); // every character that arrives it put in order in the empty array "t"
     
