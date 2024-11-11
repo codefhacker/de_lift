@@ -3,8 +3,6 @@
 #include "ArduinoSort.h"
 #include "IO_lift.h"
 
-
-
 MotorLift MotorLift(13,12,11);
 
 void setup() {
@@ -78,12 +76,12 @@ void setMoveQueue() {
       indexToClear[25]++;
     }
     else {
-      if (moveQueueCounter =< 0) {
+      if (moveQueueCounter <= 0) {
         if (queueCounter == 0) {
           return;
         }
 
-        if ((currentFloor - queue[0]) < 0) {
+        if ((currentFloor - queue[0][0]) < 0) {
           upDown = 1;
         } else {
           upDown = 0;
@@ -120,10 +118,10 @@ void moveLift() {
     MotorLift.controlMotor(0);
 
     if (moveQueueCounter > 0) { // set new destination
-      destination = moveQueueCounter[0];
+      destination = moveQueue[0];
 
-      for (i=0; i < moveQueueCounter; i++) {
-        moveQueue[i] = moveQueue[i+1];
+      for (int i=0; i < moveQueueCounter; i++) {
+        moveQueue[i] = moveQueue[i+1]; // delete and shift
       }
       moveQueueCounter--;
       
