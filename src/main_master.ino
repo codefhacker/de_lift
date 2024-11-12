@@ -10,6 +10,9 @@ const byte COLS = 4;
 
 Logica Logica;
 
+SegmentDisplay SegmentDisplay(8, 12, 11); // latchpin , 
+LiftKnop LiftKnop1(6, 9); // knoppin , ledpin
+
 
 
 char hexaKeys[ROWS][COLS] = {
@@ -27,32 +30,51 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 
 
 
-MotorLift MotorLift(13,12,11);
+MotorLift MotorLift(30,31,32);
 void setup()
 
 {
+  LiftKnop1.setupPins();
+  SegmentDisplay.setupSegmentDisplay();
   MotorLift.setupMotor();
   Serial.begin(9600);
   Serial.println("test123");
+  SegmentDisplay.writeNumber(2); 
+  delay(1000);
+  SegmentDisplay.writeNumber(3); 
+  delay(1000);
+  SegmentDisplay.writeNumber(4); 
+  delay(1000);
+  
   Wire.begin(); // join i2c bus (address optional for master)
+
 }
 
 int x = 0;
 
 void loop()
 {
-  MotorLift.controlMotor(0);
-  char customKey = customKeypad.getKey();
-  if (customKey){
-    Serial.println(customKey);
+  
+  //MotorLift.controlMotor(1);
+  LiftKnop1.readButton();
+
+  int statusKopBoven = LiftKnop1.knopState;
+  if(statusKopBoven){
+    while(1){
+      MotorLift.controlMotor(0);
+      delay(10000000000);
+      
+    }
   }
+  
 
   for(int i = 1; i <=6; i++){
     Wire.beginTransmission(i); // transmit to device #4
-    Wire.write(Logica.huidigVerdieping);              // sends one byte  
+    Wire.write(Logica.huidigeVerdieping);
+    SegmentDisplay.writeNumber(Logica.huidigeVerdieping);              // sends one byte  
     Wire.endTransmission();    // stop transmitting
   }
-  x++;
+  
 
   for (int i = 1; i <= 5; i++){
     ReceiveSlave(i);
@@ -68,30 +90,70 @@ void loop()
 }
 
 
-void ReceiveSlave(int slavenumer)  {
-  Wire.requestFrom(slavenumer, 2);
+void ReceiveSlave(int slavenummer)  {
+  
+  Wire.requestFrom(slavenummer, 2);
   
   
   c = Wire.read(); // every character that arrives it put in order in the empty array "t"
  
   
-  if (c == 3 || c == 5){
-    Logica.berekenWaarNaarToe(1,slavenumer - 1);
-    Serial.println("lift gedetecteerd");
-    MotorLift.controlMotor(2);
-    Serial.println(Logica.verdieping[slavenumer -1]);
-    Logica.huidigVerdieping = slavenumer - 1;
+  
+  if (c == 2 || c == 4){
+    Logica.berekenWaarNaarToe(Logica.huidigeVerdieping,slavenummer - 1);
+    MotorLift.controlMotor(Logica.motorRichting);
+    Logica.slavenummer = slavenummer - 1;
   }
+
   if (c == 1){
-    Logica.huidigVerdieping = slavenumer - 1;
-    Serial.println("sensor detecteerd");
-    Serial.print("c :");
-    Serial.println(c);
-    Serial.println(slavenumer);
-    Serial.print("verieping :");
-  Serial.println(Logica.huidigVerdieping);
+    
+    Logica.huidigeVerdieping = slavenummer - 1;
+    Serial.println(Logica.huidigeVerdieping);
+    Logica.berekenWaarNaarToe(Logica.huidigeVerdieping,Logica.slavenummer);
+    MotorLift.controlMotor(Logica.motorRichting);
+    //Serial.println("sensor detecteerd");
+    //Serial.print("c :");
+    
+    
+    //Serial.print("verieping :");
+    Serial.print("slave :");
+    Serial.println(slavenummer -1);
+    SegmentDisplay.writeNumber(slavenummer -1);
+    char customKey = customKeypad.getKey();
+
+    if (customKey == '0'){
+      Logica.slavenummer = 0;
+
+    }
+    if (customKey == '1'){
+      Logica.slavenummer = 1;
+
+    }
+    if (customKey == '2'){
+      Logica.slavenummer = 2;
+
+    }
+    if (customKey == '2'){
+      Logica.slavenummer = 2;
+
+    }
+    if (customKey == '3'){
+      Logica.slavenummer = 3;
+
+    }
+    if (customKey == '4'){
+      Logica.slavenummer = 4;
+
+    }
+    
+
+    
+  
   }
-  Serial.println(c);
+
+  
+  
+  //Serial.println(c);
 }
   
 
