@@ -1,15 +1,50 @@
+#include "HardwareSerial.h"
 #include "Arduino.h"
 #include "Logica_lift.h"
 
 
 
-void Logica::berekenWaarNaarToe(int huidigeVerdieping, int gewensteVerdieping){
-      int verschil = gewensteVerdieping - huidigeVerdieping;
-      if (gewensteVerdieping >=1 && gewensteVerdieping <=5){
-        verdieping[gewensteVerdieping -1] = 1;
-
+void Logica::berekenWaarNaarToe(int huidigeVerdieping, int slaveVerdieping){
+      Serial.print("huidige verdieping : ");
+      Serial.println(huidigeVerdieping);
+      Serial.print("slaveverdieping : ");
+      Serial.println(slaveVerdieping);
+      if(huidigeVerdieping == slaveVerdieping){
+        Logica::motorRichting = 0;
+        Logica::slavenummer = Logica::huidigeVerdieping;
+        Logica::huidigeVerdieping = Logica::slavenummer;
+        Serial.print("ik ben 0 !!!!!");
+        
       }
-    }
+      else {
+        int verschil = slaveVerdieping - huidigeVerdieping;
+        if (slaveVerdieping >=0 && slaveVerdieping <=4){
+          verdieping[slaveVerdieping -1] = 1;
+        }
+        if(verschil <= -1 && verschil >= -4 && verschil != 0){
+          Logica::motorRichting = 2;
+          Serial.println("ik ga naar beneden");
+          
+
+        }
+        if(verschil >= 1 && verschil <= 4 && verschil != 0){
+          Logica::motorRichting = 1;
+          Serial.println("ik ga naar boven");
+          
+        }
+
+        
+        Serial.print("verschil : ");
+        Serial.println(verschil);
+        Serial.print("huidige verdieping : ");
+        Serial.println(huidigeVerdieping);
+        //Serial.print("slave nummer : ");
+        //Serial.println(slaveVerdieping);
+      }
+
+      
+      
+}
 
 
 int Logica::berekenTotaleWaarde(int sensorBoven, int sensorBeneden, char sensorIR){
