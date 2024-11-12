@@ -6,7 +6,10 @@
 class Logica {
   
   public:
-    int verdieping[4] = {0,0,0,0};
+    int verdieping[5] = {0,0,0,0,0};
+    int huidigeVerdieping = 0;
+    int motorRichting = 0;
+    int slavenummer = 0;
     
 
     void berekenWaarNaarToe(int huidigeVerdieping, int gewensteVerdieping);
