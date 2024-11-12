@@ -3,13 +3,14 @@
 #include "ArduinoSort.h"
 #include "IO_lift.h"
 
-MotorLift MotorLift(13,12,11);
+MotorLift MotorLift(30,31,32);
 
 void setup() {
   MotorLift.setupMotor();
   Serial.begin (9600);
   Serial.println("initializing");
   Wire.begin(); // Join i2c bus (address optional for master)
+  pinMode(6, INPUT);
 }
 
 
@@ -37,35 +38,53 @@ direction [0/1/2]
 
 
 void loop() {
+  if (digitalRead(6) == 1) {
+    MotorLift.controlMotor(0);
+  }
   
   for (int i=1 ; i < 6; i++) {
-    setCurrentFloorLift(ReceiveSlave(i), i);
+    setCurrentFloorLift(ReceiveSlave(i), i-1);
   }
-  moveLift();
   transmitCurrentFloor();
   setMoveQueue();
-
   printQueue();
+  moveLift();
+ 
+
+
+
 
 }
 
 void printQueue(){
+
+  Serial.print("Updown: ");
+  Serial.println(upDown);
+  Serial.print("QueueCounter: ");
+  Serial.println(queueCounter);
   Serial.print("CurrentFloor:   ");
   Serial.println(currentFloor);
+  Serial.println("------------");
+  Serial.println("QUEUE");
 
   for (int i = 0; i < queueCounter; i++) {
     Serial.print(queue[i][0]);
     Serial.print(". ");
+    Serial.print(queue[i][1]);
     Serial.print("|");
   }
-  Serial.println();
 
+  Serial.println();
+  Serial.println("----------------");
+  Serial.println("MOVEQUEUE");
   for (int i = 0; i < moveQueueCounter; i++) {
     Serial.print(moveQueue[i]);
     Serial.print(". ");
     Serial.print("|");
   }
   Serial.println();
+  Serial.println("----------------");
+
 
 }
 
@@ -77,7 +96,7 @@ void setMoveQueue() {
     upDown = 1;
   }
 
-  if (currentFloor == 5) {
+  if (currentFloor == 4) {
     upDown = 0;
   }
 
@@ -88,6 +107,7 @@ void setMoveQueue() {
     if (queue[i][0] > currentFloor && queue[i][1]==upDown && upDown == 1) {
       indexToClear[indexToClear[25]] = i;
       moveQueue[moveQueueCounter] = queue[i][0];
+      moveQueueCounter++;
 
       indexToClear[25]++;
     }
@@ -95,6 +115,8 @@ void setMoveQueue() {
     else if (queue[i][0] < currentFloor && queue[i][1]==upDown && upDown == 0) {
       indexToClear[indexToClear[25]] = i;
       moveQueue[moveQueueCounter] = queue[i][0];
+      moveQueueCounter++;
+
       indexToClear[25]++;
     }
     else {
@@ -172,8 +194,6 @@ void moveLift() {
 
 void setCurrentFloorLift(int code, int floor) {
 
-
-
   switch (code) {
     
     //Lift detected
@@ -182,35 +202,30 @@ void setCurrentFloorLift(int code, int floor) {
       break;
 
     case 3:
-    // down pressed
-      currentFloor = floor;
-      queue[queueCounter][0] = floor;
-      queue[queueCounter++][1] = 0;
-      break;
-
-    case 5:
-    //up
       currentFloor = floor;
       queue[queueCounter][0] = floor;
       queue[queueCounter++][1] = 1;
       break;
 
+    case 5:
+      currentFloor = floor;
+      queue[queueCounter][0] = floor;
+      queue[queueCounter++][1] = 0;
+      break;
+
     case 7:
-    //Both pressed
       currentFloor = floor;
       break;
 
 
-    // no lift detected
     case 2:
-      // down
       queue[queueCounter][0] = floor;
-      queue[queueCounter++][1] = 0;
+      queue[queueCounter++][1] = 1;
       break;
     
     case 4:
       queue[queueCounter][0] = floor;
-      queue[queueCounter++][1] = 1;
+      queue[queueCounter++][1] = 0 ;
       break;
 
 
@@ -221,7 +236,7 @@ void setCurrentFloorLift(int code, int floor) {
       queue[queueCounter][0] = floor;
       queue[queueCounter++][1] = 1;
 
-      break;
+      break; 
   }
 
 }
