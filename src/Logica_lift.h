@@ -10,6 +10,10 @@ class Logica {
     int huidigeVerdieping = 0;
     int motorRichting = 0;
     int slavenummer = 0;
+    int wachtrij[10];
+    int wachtrijCount;
+    long currentTime = 0;
+    long bGTimer = 5000;  
     
 
     void berekenWaarNaarToe(int huidigeVerdieping, int gewensteVerdieping);
