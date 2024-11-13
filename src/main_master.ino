@@ -119,32 +119,37 @@ void ReceiveSlave(int slavenummer)  {
     Serial.print("slave :");
     Serial.println(slavenummer -1);
     SegmentDisplay.writeNumber(slavenummer -1);
-    char customKey = customKeypad.getKey();
 
-    if (customKey == '0'){
-      Logica.slavenummer = 0;
+    if (Logica.motorRichting == 0){
+      char customKey = customKeypad.getKey();
 
+      if (customKey == '0'){
+        Logica.slavenummer = 0;
+
+      }
+      if (customKey == '1'){
+        Logica.slavenummer = 1;
+
+      }
+      if (customKey == '2'){
+        Logica.slavenummer = 2;
+
+      }
+      if (customKey == '2'){
+        Logica.slavenummer = 2;
+
+      }
+      if (customKey == '3'){
+        Logica.slavenummer = 3;
+
+      }
+      if (customKey == '4'){
+        Logica.slavenummer = 4;
+
+      }
     }
-    if (customKey == '1'){
-      Logica.slavenummer = 1;
-
-    }
-    if (customKey == '2'){
-      Logica.slavenummer = 2;
-
-    }
-    if (customKey == '2'){
-      Logica.slavenummer = 2;
-
-    }
-    if (customKey == '3'){
-      Logica.slavenummer = 3;
-
-    }
-    if (customKey == '4'){
-      Logica.slavenummer = 4;
-
-    }
+    Serial.print("array waarde : ");
+    Serial.println(Logica.verdieping[slavenummer -1]);
     
 
     
