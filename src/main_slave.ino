@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "IO_lift.h"
 #include "Logica_lift.h"
-#define SLAVE_ADDR 5
+#define SLAVE_ADDR 1
 #define ANSWERSIZE 1
 Logica Logica;
 
@@ -62,23 +62,29 @@ void loop()
   Serial.println(statusKopBeneden);
   
   if (statusKopBeneden){
-    digitalWrite(A0, HIGH);
-    digitalWrite(A1, HIGH);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
     digitalWrite(5, HIGH);
     
   }
   if (statusKopBoven){
-    digitalWrite(A0, HIGH);
-    digitalWrite(A1, HIGH);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
     digitalWrite(9, HIGH);
     
     
   }
   if(IR_value == '1'){
-    digitalWrite(A0, LOW);
+    digitalWrite(A0, HIGH);
     digitalWrite(A1, LOW);
     digitalWrite(9, LOW);
     digitalWrite(5, LOW);
+    
+  }
+  if(IR_value == '0'){
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, HIGH);
+    
     
   }
   
@@ -115,7 +121,4 @@ void requestEvent() {
   Serial.println(Total_value);  // Print what is being sent
   Wire.write(Total_value);  // Send the byte to the master
 }
-  Serial.print("Sending Total_value: ");
-  Serial.println(Total_value);  // Print what is being sent
-  Wire.write(Total_value);  // Send the byte to the master
-}
+  
