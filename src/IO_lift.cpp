@@ -13,7 +13,7 @@ Voorbeelden hoe je alles moet coderen is te vinden in de map voorbeelden.
 zie ook de Logica_lift libary voor de logica van de lift zoals het berekenen van de verdieping en het bereken van de waarde die verstuurd wordt via i2c naar de master.
 
 
-Datum laatst gewijzigd : 11-11-2024
+Datum laatst gewijzigd : 13-10-2024
 
 */
 
@@ -168,6 +168,23 @@ void SegmentDisplay::writeNumber(int displayNumber){
     case 9:{ // nummer 9
       byte data;
       data = 0b11111110;
+      digitalWrite(shiftregisterLatchpin, 0);
+      shiftOut(data);
+      digitalWrite(shiftregisterLatchpin, 1);
+      break;
+    }
+
+    case 10:{ // error code 
+      byte data;
+      data = 0b11101011;
+      digitalWrite(shiftregisterLatchpin, 0);
+      shiftOut(data);
+      digitalWrite(shiftregisterLatchpin, 1);
+      break;
+    }
+    case 11:{ // alles uit 
+      byte data;
+      data = 0b00000000;
       digitalWrite(shiftregisterLatchpin, 0);
       shiftOut(data);
       digitalWrite(shiftregisterLatchpin, 1);
