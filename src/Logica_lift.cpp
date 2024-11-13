@@ -1,3 +1,23 @@
+/*
+
+lift libary voor de lift van groep 9
+
+Gemaakt door Fabian Boshoven 
+student nummer : 1089500
+
+Deze libary bevat logica voor het besturen van de lift
+
+Voorbeelden hoe je alles moet coderen is te vinden in de map voorbeelden.
+
+
+zie ook de IO libary
+
+Datum laatst gewijzigd : 13-11-2024
+
+*/
+
+
+
 #include "HardwareSerial.h"
 #include "Arduino.h"
 #include "Logica_lift.h"
